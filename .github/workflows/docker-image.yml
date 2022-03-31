@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: all
+  pull_request:
+    branches: all
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Login to my registry
+      run: docker login monregistry.com --password $MON_PASSWORD_TOP_SECRET
+
+      # TODO: faire que si on pousse sur main, on étiquette à test-github-actions:latest et pas test-github-actions:main
+    - name: "Definit le nom de l'image"
+      run: NOM_IMAGE=monregistry.com/test-github-actions:$(date +%s)
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag $NOM_IMAGE
+    - name: Push the image
+      run: docker push $NOM_IMAGE
